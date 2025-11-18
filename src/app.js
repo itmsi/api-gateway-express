@@ -19,11 +19,45 @@ app.use(express.urlencoded({ extended: true, limit: jsonLimit }))
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', { stream }))
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' })
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  })
+})
+
+// Debug endpoint to check gateway status
+app.get('/debug/gateway', (req, res) => {
+  const gateway = app.locals.gateway
+  if (!gateway) {
+    return res.status(500).json({ error: 'Gateway not initialized' })
+  }
+  
+  const config = gateway.getConfig()
+  res.json({
+    status: 'ok',
+    configLoaded: !!config,
+    servicesCount: config?.services?.length || 0,
+    services: config?.services?.map(s => ({
+      name: s.name,
+      url: s.url,
+      routesCount: s.routes?.length || 0,
+    })) || [],
+  })
 })
 
 const gateway = new Gateway(app, { configPath: process.env.GATEWAY_CONFIG || 'kong.yml' })
-gateway.load()
+
+try {
+  gateway.load()
+  logger.info('Gateway configuration loaded successfully')
+} catch (error) {
+  logger.error('Failed to load gateway configuration', {
+    error: error.message,
+    stack: error.stack,
+  })
+  process.exit(1)
+}
 
 app.locals.gateway = gateway
 
