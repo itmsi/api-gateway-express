@@ -106,6 +106,14 @@ class Gateway {
       }),
       pathRewrite: rewrite,
       onProxyReq: (proxyReq, req) => {
+        logger.info('Proxying request', {
+          method: req.method,
+          originalUrl: req.originalUrl,
+          target: service.url,
+          service: service.name,
+          route: routePath,
+        })
+        
         if (route?.preserve_host === false) {
           proxyReq.removeHeader('host')
         }

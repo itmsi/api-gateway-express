@@ -18,6 +18,19 @@ app.use(express.json({ limit: jsonLimit }))
 app.use(express.urlencoded({ extended: true, limit: jsonLimit }))
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', { stream }))
 
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info('Incoming request', {
+    method: req.method,
+    url: req.originalUrl,
+    path: req.path,
+    host: req.headers.host,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  })
+  next()
+})
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok',
@@ -146,5 +159,34 @@ const startWatcher = (config) => {
 }
 
 startWatcher(gateway.getConfig())
+
+// 404 handler for unmatched routes
+app.use((req, res) => {
+  logger.warn('Route not found', {
+    method: req.method,
+    url: req.originalUrl,
+    path: req.path,
+    host: req.headers.host,
+  })
+  res.status(404).json({
+    error: 'Not Found',
+    message: `Route ${req.method} ${req.originalUrl} not found`,
+    availableEndpoints: ['/health', '/debug/gateway', '/admin/reload', '/admin/config'],
+  })
+})
+
+// Error handler
+app.use((err, req, res, next) => {
+  logger.error('Application error', {
+    error: err.message,
+    stack: err.stack,
+    method: req.method,
+    url: req.originalUrl,
+  })
+  res.status(err.status || 500).json({
+    error: 'Internal Server Error',
+    message: err.message,
+  })
+})
 
 module.exports = app
