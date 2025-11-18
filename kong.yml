@@ -1,36 +1,1600 @@
+_format_version: "3.0"
+_transform: true
+
 services:
-  - name: users-service
-    url: http://localhost:3001
+  - name: example-service
+    url: http://localhost:3000
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
     routes:
-      - paths:
-          - /users
-        strip_path: false
-    plugins:
-      - name: jwt-auth
-      - name: rate-limit
-        config:
-          policy: memory
-          points: 10
-          duration: 60
-  - name: public-service
-    url: http://localhost:3002
-    routes:
-      - paths:
-          - /public
+      - name: example-route
+        paths:
+          - /api/v1/example
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
         strip_path: true
-        rewrite_path: /
-    plugins:
-      - name: logging
 
-admin:
-  enabled: true
-  base_path: /admin
-  auth:
-    type: basic
-    username: ${ADMIN_USER:-admin}
-    password: ${ADMIN_PASS:-admin}
+  - name: sso-service
+    url: http://localhost:9518
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      - name: sso-login-route
+        paths:
+          - /api/auth/sso/login
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-logout-route
+        paths:
+          - /api/auth/sso/logout
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      - name: sso-userinfo-route
+        paths:
+          - /api/auth/sso/userinfo
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      - name: sso-profile-route
+        paths:
+          - /api/auth/sso/profil
+        methods:
+          - GET
+          - PUT
+          - OPTIONS
+        strip_path: false
+      - name: sso-menus-route
+        paths:
+          - /api/menus
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-menus-get-route
+        paths:
+          - /api/menus/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-menus-create-route
+        paths:
+          - /api/menus/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-companies-route
+        paths:
+          - /api/companies
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-companies-get-route
+        paths:
+          - /api/companies/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-companies-create-route
+        paths:
+          - /api/companies/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-departments-route
+        paths:
+          - /api/departments
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-departments-get-route
+        paths:
+          - /api/departments/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-departments-create-route
+        paths:
+          - /api/departments/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-employees-route
+        paths:
+          - /api/employees
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-employees-get-route
+        paths:
+          - /api/employees/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-employees-create-route
+        paths:
+          - /api/employees/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-roles-route
+        paths:
+          - /api/roles
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-roles-get-route
+        paths:
+          - /api/roles/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-roles-create-route
+        paths:
+          - /api/roles/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-permissions-route
+        paths:
+          - /api/permissions
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-permissions-get-route
+        paths:
+          - /api/permissions/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-permissions-create-route
+        paths:
+          - /api/permissions/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-users-route
+        paths:
+          - /api/users
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-users-get-route
+        paths:
+          - /api/users/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-users-create-route
+        paths:
+          - /api/users/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-titles-route
+        paths:
+          - /api/titles
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-titles-get-route
+        paths:
+          - /api/titles/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-titles-create-route
+        paths:
+          - /api/titles/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-menu-has-permissions-route
+        paths:
+          - /api/menu-has-permissions
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-role-has-menu-permissions-route
+        paths:
+          - /api/role-has-menu-permissions
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-customers-get-route
+        paths:
+          - /api/customers/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-customers-create-route
+        paths:
+          - /api/customers/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-customers-route
+        paths:
+          - /api/customers
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: sso-bank_accounts-get-route
+        paths:
+          - /api/bank_accounts/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-bank_accounts-create-route
+        paths:
+          - /api/bank_accounts/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: sso-bank_accounts-route
+        paths:
+          - /api/bank_accounts
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
 
-watcher:
-  enabled: true
-  debounce: 500
-
+  - name: power-bi-service
+    url: http://localhost:9544
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # PowerBI Dashboard routes (most specific first)
+      - name: power-bi-dashboards-route
+        paths:
+          - /api/powerbi/dashboard
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # PowerBI routes (specific endpoints before general)
+      - name: power-bi-powerbi-get-route
+        paths:
+          - /api/powerbi/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: power-bi-powerbi-create-route
+        paths:
+          - /api/powerbi/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: power-bi-powerbi-route
+        paths:
+          - /api/powerbi
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Categories routes (specific endpoints before general)
+      - name: power-bi-categories-get-route
+        paths:
+          - /api/categories/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: power-bi-categories-create-route
+        paths:
+          - /api/categories/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: power-bi-categories-route
+        paths:
+          - /api/categories
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+  - name: interview-service
+    url: http://localhost:9502
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # Review interviews route (most specific)
+      - name: interview-review-interviews-route
+        paths:
+          - /api/reviewInterview/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Public applicants route (specific public endpoint)
+      - name: interview-public-applicants-get-route
+        paths:
+          - /api/public/applicants/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Companies routes
+      - name: interview-companies-get-route
+        paths:
+          - /api/interview/companies/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-companies-route
+        paths:
+          - /api/interview/companies
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Departments routes
+      - name: interview-departments-get-route
+        paths:
+          - /api/interview/departments/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-departments-route
+        paths:
+          - /api/interview/departments
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Titles routes
+      - name: interview-titles-get-route
+        paths:
+          - /api/interview/titles/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-titles-route
+        paths:
+          - /api/interview/titles
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Islands routes
+      - name: interview-islands-get-route
+        paths:
+          - /api/interview/islands/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-islands-route
+        paths:
+          - /api/interview/islands
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Genders routes
+      - name: interview-genders-get-route
+        paths:
+          - /api/interview/genders/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-genders-route
+        paths:
+          - /api/interview/genders
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Employees routes
+      - name: interview-employees-get-route
+        paths:
+          - /api/interview/employees/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-employees-route
+        paths:
+          - /api/interview/employees
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      # Schedule interviews routes (before interviews routes due to specificity)
+      - name: interview-schedule-interviews-get-route
+        paths:
+          - /api/schedule-interviews/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-schedule-interviews-route
+        paths:
+          - /api/schedule-interviews
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Interviews routes
+      - name: interview-interviews-get-route
+        paths:
+          - /api/interviews/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-interviews-route
+        paths:
+          - /api/interviews
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # On board documents routes (before background-checks due to specificity)
+      - name: interview-on-board-documents-get-route
+        paths:
+          - /api/on-board-documents/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-on-board-documents-route
+        paths:
+          - /api/on-board-documents
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Background checks routes
+      - name: interview-background-checks-get-route
+        paths:
+          - /api/background-checks/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-background-checks-route
+        paths:
+          - /api/background-checks
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Candidates routes
+      - name: interview-candidates-get-route
+        paths:
+          - /api/candidates/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-candidates-route
+        paths:
+          - /api/candidates
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Applicants routes
+      - name: interview-applicants-get-route
+        paths:
+          - /api/applicants/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-applicants-route
+        paths:
+          - /api/applicants
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Notes routes
+      - name: interview-notes-get-route
+        paths:
+          - /api/notes/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: interview-notes-route
+        paths:
+          - /api/notes
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+  - name: ecatalogue-service
+    url: http://localhost:9550
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # Categories routes
+      - name: catalogs-categories-get-route
+        paths:
+          - /api/catalogs/categories/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-categories-create-route
+        paths:
+          - /api/catalogs/categories/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-categories-route
+        paths:
+          - /api/catalogs/categories
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Catalogs routes
+      - name: catalogs-catalogs-get-route
+        paths:
+          - /api/catalogs/catalogs/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-catalogs-create-route
+        paths:
+          - /api/catalogs/catalogs/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-catalogs-route
+        paths:
+          - /api/catalogs/catalogs
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Catalog Items routes
+      - name: catalogs-catalogItems-get-route
+        paths:
+          - /api/catalogs/catalogItems/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-catalogItems-create-route
+        paths:
+          - /api/catalogs/catalogItems/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-catalogItems-route
+        paths:
+          - /api/catalogs/catalogItems
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Locations routes
+      - name: catalogs-locations-get-route
+        paths:
+          - /api/catalogs/locations/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-locations-create-route
+        paths:
+          - /api/catalogs/locations/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-locations-route
+        paths:
+          - /api/catalogs/locations
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Driver Types routes
+      - name: catalogs-driver_types-get-route
+        paths:
+          - /api/catalogs/driver_types/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-driver_types-create-route
+        paths:
+          - /api/catalogs/driver_types/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-driver_types-route
+        paths:
+          - /api/catalogs/driver_types
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Vehicle Weights routes
+      - name: catalogs-vehicle_weights-get-route
+        paths:
+          - /api/catalogs/vehicle_weights/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-vehicle_weights-create-route
+        paths:
+          - /api/catalogs/vehicle_weights/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-vehicle_weights-route
+        paths:
+          - /api/catalogs/vehicle_weights
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Brands routes
+      - name: catalogs-brands-get-route
+        paths:
+          - /api/catalogs/brands/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-brands-create-route
+        paths:
+          - /api/catalogs/brands/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-brands-route
+        paths:
+          - /api/catalogs/brands
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # World Manufacturing Plants routes
+      - name: catalogs-world_manufacturing_plants-get-route
+        paths:
+          - /api/catalogs/world_manufacturing_plants/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-world_manufacturing_plants-create-route
+        paths:
+          - /api/catalogs/world_manufacturing_plants/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-world_manufacturing_plants-route
+        paths:
+          - /api/catalogs/world_manufacturing_plants
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Productions routes
+      - name: catalogs-productions-get-route
+        paths:
+          - /api/catalogs/productions/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-productions-create-route
+        paths:
+          - /api/catalogs/productions/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-productions-route
+        paths:
+          - /api/catalogs/productions
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Sidebars routes
+      - name: catalogs-sidebars-get-route
+        paths:
+          - /api/catalogs/sidebars/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-sidebars-create-route
+        paths:
+          - /api/catalogs/sidebars/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-sidebars-route
+        paths:
+          - /api/catalogs/sidebars
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Type cabine routes
+      - name: catalogs-type_cabine-get-route
+        paths:
+          - /api/catalogs/type_cabine/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_cabine-create-route
+        paths:
+          - /api/catalogs/type_cabine/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_cabine-route
+        paths:
+          - /api/catalogs/type_cabine
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Cabines routes
+      - name: catalogs-cabines-get-route
+        paths:
+          - /api/catalogs/cabines/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-cabines-create-route
+        paths:
+          - /api/catalogs/cabines/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-cabines-route
+        paths:
+          - /api/catalogs/cabines
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Type Engine routes
+      - name: catalogs-type_engine-get-route
+        paths:
+          - /api/catalogs/type_engine/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_engine-create-route
+        paths:
+          - /api/catalogs/type_engine/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_engine-route
+        paths:
+          - /api/catalogs/type_engine
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Engines routes
+      - name: catalogs-engines-get-route
+        paths:
+          - /api/catalogs/engines/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-engines-create-route
+        paths:
+          - /api/catalogs/engines/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-engines-route
+        paths:
+          - /api/catalogs/engines
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Type Transmission routes
+      - name: catalogs-type_transmission-get-route
+        paths:
+          - /api/catalogs/type_transmission/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_transmission-create-route
+        paths:
+          - /api/catalogs/type_transmission/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_transmission-route
+        paths:
+          - /api/catalogs/type_transmission
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Transmission routes
+      - name: catalogs-transmission-get-route
+        paths:
+          - /api/catalogs/transmission/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-transmission-create-route
+        paths:
+          - /api/catalogs/transmission/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-transmission-route
+        paths:
+          - /api/catalogs/transmission
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Type Axel routes
+      - name: catalogs-type_axel-get-route
+        paths:
+          - /api/catalogs/type_axel/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_axel-create-route
+        paths:
+          - /api/catalogs/type_axel/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_axel-route
+        paths:
+          - /api/catalogs/type_axel
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Axel routes
+      - name: catalogs-axel-get-route
+        paths:
+          - /api/catalogs/axel/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-axel-create-route
+        paths:
+          - /api/catalogs/axel/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-axel-route
+        paths:
+          - /api/catalogs/axel
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Type Steering routes
+      - name: catalogs-type_steering-get-route
+        paths:
+          - /api/catalogs/type_steering/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_steering-create-route
+        paths:
+          - /api/catalogs/type_steering/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-type_steering-route
+        paths:
+          - /api/catalogs/type_steering
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # Steering routes
+      - name: catalogs-steering-get-route
+        paths:
+          - /api/catalogs/steering/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-steering-create-route
+        paths:
+          - /api/catalogs/steering/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-steering-route
+        paths:
+          - /api/catalogs/steering
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # all items catalogs routes
+      - name: catalogs-all-item-catalogs-get-route
+        paths:
+          - /api/catalogs/all-item-catalogs/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-all-item-catalogs-create-route
+        paths:
+          - /api/catalogs/all-item-catalogs/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-all-item-catalogs-download-route
+        paths:
+          - /api/catalogs/all-item-catalogs/download-template
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      - name: catalogs-all-item-catalogs-route
+        paths:
+          - /api/catalogs/all-item-catalogs
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # all master pdf routes
+      - name: catalogs-master-pdf-get-route
+        paths:
+          - /api/catalogs/master-pdf/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+  - name: epc-service
+    url: http://localhost:9566
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # epc master category routes
+      - name: epc-master-category-get-route
+        paths:
+          - /api/epc/master_category/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-master-category-create-route
+        paths:
+          - /api/epc/master_category/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-master-category-route
+        paths:
+          - /api/epc/master_category
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc categories routes
+      - name: epc-categories-get-route
+        paths:
+          - /api/epc/categories/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-categories-create-route
+        paths:
+          - /api/epc/categories/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-categories-route
+        paths:
+          - /api/epc/categories
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc type category routes
+      - name: epc-type-category-get-route
+        paths:
+          - /api/epc/type_category/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-type-category-create-route
+        paths:
+          - /api/epc/type_category/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-type-category-route
+        paths:
+          - /api/epc/type_category
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc item category routes
+      - name: epc-item-category-get-route
+        paths:
+          - /api/epc/item_category/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-item-category-create-route
+        paths:
+          - /api/epc/item_category/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-item-category-route
+        paths:
+          - /api/epc/item_category
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: epc-item-category-dokumen-route
+        paths:
+          - /api/epc/item_category/dokumen
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      # epc products routes
+      - name: epc-products-get-route
+        paths:
+          - /api/epc/products/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-products-create-route
+        paths:
+          - /api/epc/products/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-products-route
+        paths:
+          - /api/epc/products
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc dokumen routes
+      - name: epc-dokumen-get-route
+        paths:
+          - /api/epc/dokumen/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-dokumen-create-route
+        paths:
+          - /api/epc/dokumen/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-dokumen-duplikat-route
+        paths:
+          - /api/epc/dokumen/duplikat
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-dokumen-route
+        paths:
+          - /api/epc/dokumen
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc unit routes
+      - name: epc-unit-get-route
+        paths:
+          - /api/epc/unit/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-unit-create-route
+        paths:
+          - /api/epc/unit/create
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-unit-route
+        paths:
+          - /api/epc/unit
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # epc unit parts catalogs routes
+      - name: epc-parts-catalogs-get-route
+        paths:
+          - /api/epc/parts-catalogs/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: epc-parts-catalogs-get-by-type-category-id-route
+        paths:
+          - /api/epc/parts-catalogs/get-by-type-category-id
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      - name: epc-parts-catalogs-get-by-item-category-id-route
+        paths:
+          - /api/epc/parts-catalogs/get-by-item-category-id
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+  - name: quotation-service
+    url: http://localhost:9565
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # quotation customer routes
+      - name: quotation-customer-get-route
+        paths:
+          - /api/quotation/customer/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-customer-route
+        paths:
+          - /api/quotation/customer
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation sales routes
+      - name: quotation-sales-get-route
+        paths:
+          - /api/quotation/sales/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-sales-route
+        paths:
+          - /api/quotation/sales
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation bank-account routes
+      - name: quotation-bank-account-get-route
+        paths:
+          - /api/quotation/bank-account/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-bank-account-route
+        paths:
+          - /api/quotation/bank-account
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation item_product routes
+      - name: quotation-item_product-get-route
+        paths:
+          - /api/quotation/item_product/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-item_product-route
+        paths:
+          - /api/quotation/item_product
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation manage-quotation routes
+      - name: quotation-manage-quotation-get-route
+        paths:
+          - /api/quotation/manage-quotation/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-manage-quotation-route
+        paths:
+          - /api/quotation/manage-quotation
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      - name: quotation-manage-quotation-pdf-route
+        paths:
+          - /api/quotation/manage-quotation/pdf
+        methods:
+          - GET
+          - OPTIONS
+        strip_path: false
+      # quotation term_content routes
+      - name: quotation-term_content-get-route
+        paths:
+          - /api/quotation/term_content/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-term_content-route
+        paths:
+          - /api/quotation/term_content
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation componen_product routes
+      - name: quotation-componen_product-get-route
+        paths:
+          - /api/quotation/componen_product/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-componen_product-route
+        paths:
+          - /api/quotation/componen_product
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # quotation accessory routes
+      - name: quotation-accessory-get-route
+        paths:
+          - /api/quotation/accessory/get
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+      - name: quotation-accessory-route
+        paths:
+          - /api/quotation/accessory
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+        # web mis service
+  - name: web-mis-service
+    url: http://localhost:9509
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    routes:
+      # public product routes
+      - name: web-mis-public-product-route
+        paths:
+          - /api/public/product
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      # public product specification routes
+      - name: web-mis-public-specification-route
+        paths:
+          - /api/public/specification
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        strip_path: false
+      
+    
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 100
+      hour: 1000
+      policy: local
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - Authorization
+        - X-Auth-Token
+      exposed_headers:
+        - X-Auth-Token
+        - Authorization
+      credentials: true
+      max_age: 3600
+      preflight_continue: false
