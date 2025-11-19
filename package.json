@@ -23,8 +23,7 @@
     "consumer": "node src/scripts/start-consumer.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:proxy": "node test-proxy.js"
+    "test:coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",

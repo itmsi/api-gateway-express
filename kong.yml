@@ -1598,3 +1598,17 @@ plugins:
       credentials: true
       max_age: 3600
       preflight_continue: false
+
+# Admin API Configuration (untuk reload config tanpa restart)
+admin:
+  enabled: true
+  base_path: /admin
+  auth:
+    type: basic  # atau 'token' atau 'none'
+    username: admin
+    password: admin  # Ganti dengan password yang aman di production
+
+# File Watcher Configuration (auto-reload ketika kong.yml berubah)
+watcher:
+  enabled: true
+  debounce: 500  # delay dalam milliseconds sebelum reload
