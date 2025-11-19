@@ -80,6 +80,7 @@ const loadConfig = (configPath) => {
 
   return {
     services,
+    plugins: Array.isArray(config?.plugins) ? config.plugins : [],
     admin: config?.admin || {},
     watcher: config?.watcher || {},
     raw: config,

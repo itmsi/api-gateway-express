@@ -39,6 +39,18 @@ class Gateway {
       throw new Error('Gateway config is not loaded')
     }
     this.clearRoutes()
+    
+    // Apply global plugins to all routes
+    const globalPlugins = resolvePlugins(this.currentConfig.plugins || [], {})
+    
+    // Apply global plugins to all routes via app-level middleware
+    if (globalPlugins.length > 0) {
+      this.dynamicRouter.use(...globalPlugins)
+      logger.info('Global plugins applied', {
+        plugins: this.currentConfig.plugins?.map(p => p.name) || [],
+      })
+    }
+    
     this.currentConfig.services.forEach((service) => {
       this.registerService(service)
     })

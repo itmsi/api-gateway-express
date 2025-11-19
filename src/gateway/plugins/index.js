@@ -2,11 +2,13 @@ const { logger } = require('../logger')
 const jwtAuthPlugin = require('./jwt-auth')
 const rateLimitPlugin = require('./rate-limit')
 const loggingPlugin = require('./logging')
+const corsPlugin = require('./cors')
 
 const registry = {
   'jwt-auth': jwtAuthPlugin,
   'rate-limit': rateLimitPlugin,
   logging: loggingPlugin,
+  cors: corsPlugin,
 }
 
 const registerPlugin = (name, factory) => {
