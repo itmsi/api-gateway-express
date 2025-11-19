@@ -16,22 +16,15 @@ const jsonLimit = process.env.JSON_LIMIT || '1mb'
 app.set('trust proxy', 1)
 app.use(compression())
 
-// Conditional body parsing - skip untuk route proxy
-// Route proxy akan handle body sendiri
+// Conditional body parsing - skip untuk route proxy agar body stream tetap readable
 app.use((req, res, next) => {
-  // Skip body parsing untuk route yang akan di-proxy
-  // Gateway routes biasanya dimulai dengan /api/
   if (req.path.startsWith('/api/') || req.path.startsWith('/test/proxy-static')) {
-    // Untuk route proxy, kita skip body parsing
-    // Proxy akan handle body stream sendiri
     return next()
   }
-  // Untuk route lain, parse body seperti biasa
   express.json({ limit: jsonLimit })(req, res, next)
 })
 
 app.use((req, res, next) => {
-  // Skip urlencoded parsing untuk route proxy juga
   if (req.path.startsWith('/api/') || req.path.startsWith('/test/proxy-static')) {
     return next()
   }
@@ -81,19 +74,8 @@ app.get('/debug/gateway', (req, res) => {
   })
 })
 
-// Test endpoint dengan proxy statis - untuk memastikan proxy bisa hit ke API destinasi
-// Gunakan: POST /test/proxy-static/api/auth/sso/login
+// Test endpoint dengan proxy statis untuk debugging
 const { createProxyMiddleware } = require('http-proxy-middleware')
-
-// Middleware untuk logging sebelum proxy
-app.use('/test/proxy-static', (req, res, next) => {
-  logger.info('🔵 STATIC PROXY: Request masuk', {
-    method: req.method,
-    originalUrl: req.originalUrl,
-    path: req.path,
-  })
-  next()
-})
 
 const staticProxy = createProxyMiddleware({
   target: 'http://127.0.0.1:9518',
@@ -101,31 +83,16 @@ const staticProxy = createProxyMiddleware({
   secure: false,
   xfwd: true,
   logLevel: 'silent',
-  timeout: 30000, // 30 detik timeout
+  timeout: 30000,
   proxyTimeout: 30000,
   pathRewrite: {
-    '^/test/proxy-static': '', // Strip /test/proxy-static dari path
-  },
-  onProxyReq: (proxyReq, req, res) => {
-    logger.info('✅ STATIC PROXY: Request dikirim ke API destinasi', {
-      method: req.method,
-      originalUrl: req.originalUrl,
-      targetPath: proxyReq.path,
-      fullUrl: `http://127.0.0.1:9518${proxyReq.path}`,
-    })
-  },
-  onProxyRes: (proxyRes, req, res) => {
-    logger.info('✅ STATIC PROXY: Response diterima dari API destinasi', {
-      statusCode: proxyRes.statusCode,
-      path: req.originalUrl,
-    })
+    '^/test/proxy-static': '',
   },
   onError: (err, req, res) => {
-    logger.error('❌ STATIC PROXY: Error', {
+    logger.error('Static proxy error', {
       message: err.message,
       code: err.code,
       path: req.originalUrl,
-      stack: err.stack,
     })
     if (!res.headersSent) {
       let statusCode = 502
@@ -146,15 +113,8 @@ const staticProxy = createProxyMiddleware({
 app.use('/test/proxy-static', staticProxy)
 
 // Test endpoint untuk hit langsung ke API destinasi tanpa proxy
-// Ini untuk debugging - memastikan apakah masalahnya di proxy atau koneksi
 app.post('/test/direct-api', async (req, res) => {
   const targetUrl = req.query.url || 'http://127.0.0.1:9518/api/auth/sso/login'
-  
-  logger.info('Testing direct API call without proxy', {
-    targetUrl,
-    method: req.method,
-    body: req.body,
-  })
   
   try {
     const response = await axios({
@@ -166,23 +126,15 @@ app.post('/test/direct-api', async (req, res) => {
         ...req.headers,
       },
       timeout: 60000,
-      validateStatus: () => true, // Accept all status codes
+      validateStatus: () => true,
     })
     
-    logger.info('Direct API call successful', {
-      targetUrl,
-      status: response.status,
-      statusText: response.statusText,
-    })
-    
-    // Forward response dari API destinasi
     res.status(response.status).json(response.data)
   } catch (error) {
     logger.error('Direct API call failed', {
       targetUrl,
       error: error.message,
       code: error.code,
-      stack: error.stack,
     })
     
     let statusCode = 500
