@@ -19,7 +19,7 @@ services:
         strip_path: true
 
   - name: sso-service
-    url: http://localhost:9518
+    url: http://localhost:9585
     connect_timeout: 60000
     write_timeout: 60000
     read_timeout: 60000
@@ -315,7 +315,7 @@ services:
         strip_path: false
 
   - name: power-bi-service
-    url: http://localhost:9544
+    url: http://localhost:9583
     connect_timeout: 60000
     write_timeout: 60000
     read_timeout: 60000
@@ -1163,7 +1163,7 @@ services:
           - OPTIONS
         strip_path: false
   - name: epc-service
-    url: http://localhost:9566
+    url: http://localhost:9584
     connect_timeout: 60000
     write_timeout: 60000
     read_timeout: 60000
@@ -1380,7 +1380,7 @@ services:
           - OPTIONS
         strip_path: false
   - name: quotation-service
-    url: http://localhost:9565
+    url: http://localhost:9578
     connect_timeout: 60000
     write_timeout: 60000
     read_timeout: 60000
