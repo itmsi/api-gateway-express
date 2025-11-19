@@ -199,10 +199,6 @@ class Gateway {
     const timeout = service.timeout || service.connect_timeout || service.read_timeout || service.write_timeout || 60000
     const targetUrl = service.url.replace('localhost', '127.0.0.1')
     
-    // Pattern untuk match path dengan UUID
-    const uuidPattern = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
-    const pathRegex = new RegExp(`^${routePath.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}/(${uuidPattern})(/.*)?$`)
-    
     const proxyOptions = {
       target: targetUrl,
       changeOrigin: true,
@@ -214,61 +210,17 @@ class Gateway {
       followRedirects: true,
       logLevel: 'silent',
       selfHandleResponse: false,
+      // Gunakan pathRewrite untuk memastikan path asli (dari req.originalUrl) digunakan tanpa modifikasi
+      // req.originalUrl mengandung path lengkap dengan UUID dan query string seperti request asli
       pathRewrite: (path, req) => {
-        // Path dengan UUID tetap dipertahankan di path untuk semua route
-        // Menggunakan req.originalUrl yang sudah mengandung path lengkap dengan UUID
-        // Ini bekerja untuk semua route karena req.originalUrl selalu mengandung path asli
-        const uuid = req.params?.id
-        
-        if (uuid) {
-          // req.originalUrl sudah mengandung path lengkap dengan UUID
-          // Ambil path tanpa query string untuk memastikan UUID tetap di path
-          const originalPath = req.originalUrl.split('?')[0]
-          
-          // Validasi: pastikan path mengandung UUID
-          if (originalPath.includes(uuid)) {
-            return originalPath
-          }
-        }
-        
-        // Fallback: jika req.params.id tidak ada, coba extract dari path menggunakan regex
-        const match = path.match(pathRegex)
-        if (match) {
-          const uuid = match[1]
-          const additionalPath = match[2] || ''
-          // Reconstruct path dengan UUID tetap di path
-          return `${targetPath}/${uuid}${additionalPath}`
-        }
-        
-        // Jika tidak match, return path asli (seharusnya tidak terjadi)
-        logger.warn('Path rewrite fallback to original path', {
-          path: path,
-          originalUrl: req.originalUrl,
-          service: service.name
-        })
-        return path
+        // Gunakan req.originalUrl yang mengandung path asli dengan UUID dan query string
+        // Ini memastikan path dan query string tetap sama seperti request asli, hanya base URL yang diubah
+        return req.originalUrl
       },
       onProxyReq: (proxyReq, req, res) => {
-        // Preserve query string yang sudah ada dari original request
-        if (req.url && req.url.includes('?')) {
-          const originalQuery = req.url.substring(req.url.indexOf('?'))
-          // Pastikan query string ditambahkan jika belum ada di proxyReq.path
-          if (!proxyReq.path.includes('?')) {
-            proxyReq.path = proxyReq.path + originalQuery
-          }
-        }
-        
-        // Extract UUID untuk logging
-        const uuid = req.params?.id || req.originalUrl.match(pathRegex)?.[1]
-        
-        logger.info('Proxy request (with ID rewrite)', {
-          method: req.method,
-          originalPath: req.originalUrl,
-          rewrittenPath: proxyReq.path,
-          uuid: uuid,
-          target: `${service.url}${proxyReq.path}`,
-          service: service.name,
-        })
+        // Jangan modifikasi path, query string, atau body - biarkan semuanya tetap seperti request asli
+        // Path dan query string sudah di-set oleh pathRewrite menggunakan req.originalUrl
+        // Hanya set headers yang diperlukan untuk forwarding
         
         if (route?.preserve_host === false) {
           proxyReq.removeHeader('host')
@@ -277,6 +229,14 @@ class Gateway {
         proxyReq.setHeader('x-forwarded-proto', req.protocol)
         proxyReq.setHeader('x-forwarded-for', req.ip)
         proxyReq.setHeader('x-forwarded-path', req.originalUrl)
+        
+        logger.info('Proxy request (original path/query/body preserved)', {
+          method: req.method,
+          originalPath: req.originalUrl,
+          proxyPath: proxyReq.path,
+          target: `${service.url}${proxyReq.path}`,
+          service: service.name,
+        })
       },
       onProxyRes: (proxyRes, req, res) => {
         logger.info('Proxy response (with ID rewrite)', {
