@@ -121,9 +121,29 @@ class Gateway {
 
       // Logic generik: untuk setiap route path yang tidak mengandung parameter/regex,
       // tambahkan route tambahan untuk menangani path dengan UUID di akhir
-      // Skip jika path sudah mengandung parameter (:) atau regex pattern (~)
-      if (!routePath.includes(':') && !routePath.startsWith('~') && !routePath.includes('(')) {
+      // Skip jika path sudah mengandung parameter (:) atau regex pattern (~) atau path yang berakhir dengan /get, /create, dll
+      // Juga skip path yang terlalu pendek (kurang dari 3 karakter) atau path root
+      const shouldSkip = 
+        routePath.includes(':') || 
+        routePath.startsWith('~') || 
+        routePath.includes('(') ||
+        routePath.length < 3 ||
+        routePath === '/' ||
+        routePath.endsWith('/get') ||
+        routePath.endsWith('/create') ||
+        routePath.endsWith('/download-template') ||
+        routePath.endsWith('/duplikat') ||
+        routePath.endsWith('/pdf') ||
+        routePath.endsWith('/dashboard')
+      
+      if (!shouldSkip) {
         this.registerRouteWithId(service, routePath, route, handlers)
+      } else {
+        logger.debug('Skipping UUID route registration', {
+          service: service.name,
+          path: routePath,
+          reason: 'Path contains parameters, regex, or is a special endpoint'
+        })
       }
     })
   }
@@ -179,7 +199,7 @@ class Gateway {
     const timeout = service.timeout || service.connect_timeout || service.read_timeout || service.write_timeout || 60000
     const targetUrl = service.url.replace('localhost', '127.0.0.1')
     
-    // Pattern untuk match path dengan UUID dan rewrite ke path tanpa UUID
+    // Pattern untuk match path dengan UUID
     const uuidPattern = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
     const pathRegex = new RegExp(`^${routePath.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}/(${uuidPattern})(/.*)?$`)
     
@@ -195,42 +215,51 @@ class Gateway {
       logLevel: 'silent',
       selfHandleResponse: false,
       pathRewrite: (path, req) => {
-        // Rewrite path dengan UUID menjadi path tanpa UUID
-        // UUID akan di-forward sebagai query parameter di onProxyReq
+        // Path dengan UUID tetap dipertahankan di path untuk semua route
+        // Menggunakan req.originalUrl yang sudah mengandung path lengkap dengan UUID
+        // Ini bekerja untuk semua route karena req.originalUrl selalu mengandung path asli
+        const uuid = req.params?.id
+        
+        if (uuid) {
+          // req.originalUrl sudah mengandung path lengkap dengan UUID
+          // Ambil path tanpa query string untuk memastikan UUID tetap di path
+          const originalPath = req.originalUrl.split('?')[0]
+          
+          // Validasi: pastikan path mengandung UUID
+          if (originalPath.includes(uuid)) {
+            return originalPath
+          }
+        }
+        
+        // Fallback: jika req.params.id tidak ada, coba extract dari path menggunakan regex
         const match = path.match(pathRegex)
         if (match) {
-          // Return path tanpa UUID
-          // Query string akan di-handle di onProxyReq saat menambahkan UUID
-          return targetPath
+          const uuid = match[1]
+          const additionalPath = match[2] || ''
+          // Reconstruct path dengan UUID tetap di path
+          return `${targetPath}/${uuid}${additionalPath}`
         }
+        
+        // Jika tidak match, return path asli (seharusnya tidak terjadi)
+        logger.warn('Path rewrite fallback to original path', {
+          path: path,
+          originalUrl: req.originalUrl,
+          service: service.name
+        })
         return path
       },
       onProxyReq: (proxyReq, req, res) => {
-        // Extract UUID dari path (dari Express route parameter atau originalUrl)
-        const uuid = req.params?.id || req.originalUrl.match(pathRegex)?.[1]
-        
-        if (uuid) {
-          // Parse path dan query string yang sudah ada
-          const url = new URL(proxyReq.path, targetUrl)
-          
-          // Preserve query string yang sudah ada dari original request
-          if (req.url && req.url.includes('?')) {
-            const originalQuery = req.url.substring(req.url.indexOf('?') + 1)
-            const originalParams = new URLSearchParams(originalQuery)
-            originalParams.forEach((value, key) => {
-              if (!url.searchParams.has(key)) {
-                url.searchParams.set(key, value)
-              }
-            })
+        // Preserve query string yang sudah ada dari original request
+        if (req.url && req.url.includes('?')) {
+          const originalQuery = req.url.substring(req.url.indexOf('?'))
+          // Pastikan query string ditambahkan jika belum ada di proxyReq.path
+          if (!proxyReq.path.includes('?')) {
+            proxyReq.path = proxyReq.path + originalQuery
           }
-          
-          // Tambahkan UUID sebagai query parameter jika belum ada
-          if (!url.searchParams.has('id')) {
-            url.searchParams.set('id', uuid)
-          }
-          
-          proxyReq.path = url.pathname + url.search
         }
+        
+        // Extract UUID untuk logging
+        const uuid = req.params?.id || req.originalUrl.match(pathRegex)?.[1]
         
         logger.info('Proxy request (with ID rewrite)', {
           method: req.method,
