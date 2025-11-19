@@ -39,6 +39,10 @@ const normalizeRoute = (route) => {
 const normalizeService = (service) => ({
   name: service?.name,
   url: service?.url,
+  timeout: service?.timeout || service?.connect_timeout || service?.read_timeout || service?.write_timeout,
+  connect_timeout: service?.connect_timeout,
+  write_timeout: service?.write_timeout,
+  read_timeout: service?.read_timeout,
   routes: Array.isArray(service?.routes) ? service.routes.map(normalizeRoute) : [],
   plugins: Array.isArray(service?.plugins) ? service.plugins : [],
 })

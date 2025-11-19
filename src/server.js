@@ -9,19 +9,49 @@ const { logger } = require('./gateway/logger')
 const port = Number(process.env.PORT || process.env.APP_PORT || 3000)
 const server = http.createServer(app)
 
+// Suppress deprecation warnings from http-proxy dependency
+// http-proxy uses util._extend which is deprecated (DEP0060)
+// Override process.emitWarning SEBELUM dependency dimuat
+const originalEmitWarning = process.emitWarning
+process.emitWarning = function(warning, type, code, ctor) {
+  // Handle string warning
+  if (typeof warning === 'string') {
+    if (warning.includes('util._extend') || warning.includes('DEP0060')) {
+      return // Suppress
+    }
+  }
+  // Handle object warning
+  if (typeof warning === 'object' && warning !== null) {
+    if (warning.name === 'DeprecationWarning') {
+      if (warning.code === 'DEP0060' || 
+          warning.message?.includes('util._extend') ||
+          warning.message?.includes('DEP0060')) {
+        return // Suppress
+      }
+    }
+  }
+  // Handle code parameter
+  if (code === 'DEP0060') {
+    return // Suppress
+  }
+  return originalEmitWarning.call(this, warning, type, code, ctor)
+}
+
 process.on('warning', (warning) => {
-  // Filter out known deprecation warnings from dependencies
-  // http-proxy uses util._extend which is deprecated, but it's from dependency
-  if (warning.name === 'DeprecationWarning' && 
-      warning.message.includes('util._extend')) {
-    // Silently ignore this known deprecation from http-proxy dependency
-    return
+  if (warning.name === 'DeprecationWarning') {
+    // Filter DEP0060 (util._extend) dari http-proxy
+    if (warning.code === 'DEP0060' || 
+        warning.message?.includes('util._extend') ||
+        warning.message?.includes('DEP0060')) {
+      // Silently ignore - ini dari dependency http-proxy
+      return
+    }
   }
   
   logger.warn('Process warning', {
     name: warning.name,
     message: warning.message,
-    stack: warning.stack,
+    code: warning.code,
   })
 })
 
